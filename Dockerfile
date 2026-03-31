@@ -37,8 +37,7 @@ RUN test -f server/dist/index.js || (echo "ERROR: server build output missing" &
 FROM base AS production
 WORKDIR /app
 COPY --chown=node:node --from=build /app /app
-RUN npm install --global --omit=dev @anthropic-ai/claude-code@latest @openai/codex@latest opencode-ai \
-  && mkdir -p /paperclip \
+RUN mkdir -p /paperclip \
   && chown node:node /paperclip
 
 ENV NODE_ENV=production \
