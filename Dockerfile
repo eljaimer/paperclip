@@ -37,8 +37,12 @@ RUN test -f server/dist/index.js || (echo "ERROR: server build output missing" &
 FROM base AS production
 WORKDIR /app
 COPY --chown=node:node --from=build /app /app
-RUN mkdir -p /paperclip \
-  && chown node:node /paperclip
+RUN npm install --global --omit=dev @anthropic-ai/claude-code@latest @openai/codex@latest opencode-ai \
+  && mkdir -p /paperclip \
+  && chown node:node /paperclip \
+  && CLAUDE_CLI_JS=$(node -e "console.log(require.resolve('@anthropic-ai/claude-code/cli.js'))") \
+  && printf '#!/bin/sh\nexec node "%s" "$@"\n' "$CLAUDE_CLI_JS" > /usr/local/bin/claude-direct \
+  && chmod +x /usr/local/bin/claude-direct
 
 ENV NODE_ENV=production \
   HOME=/paperclip \
